@@ -1,49 +1,60 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Call the backend API to verify login credentials
+
     try {
-      const response = await fetch('YOUR_BACKEND_LOGIN_API', {
+      const response = await fetch('http://localhost:8081/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        setError('Invalid credentials');
+      const data = await response.json();
+
+      if (response.ok && data.statusCode === 200) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('role', data.role);
+
+        if (data.role === 'ADMIN') {
+          router.push('/admin/dashboard');
+        } else {
+          router.push('/employee/dashboard');
+        }
       } else {
-        // Handle successful login (e.g., redirect to dashboard)
-        // Removed `data` since it's not used
+        setError(data.message || 'Login failed. Please try again.');
       }
-    } catch {
-      setError('Error logging in. Please try again.');
+    } catch  {
+      setError('Error logging in. Please try again later.');
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-semibold text-center mb-4">Employee Login</h2>
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm text-black">
+        <h2 className="text-2xl font-semibold text-center mb-4">Login</h2>
         {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="username" className="block text-sm font-medium">Username</label>
+            <label htmlFor="email" className="block text-sm font-medium">Email</label>
             <input
-              type="text"
-              id="username"
+              type="email"
+              id="email"
               className="mt-1 p-2 w-full border border-gray-300 rounded"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
