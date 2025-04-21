@@ -14,7 +14,7 @@ const AdminHeader = () => {
     };
 
   return (
-    <div className="flex items-center justify-between bg-white p-4 rounded shadow mb-6">
+    <div className="fixed top-0 left-0 right-0 z-50 w-full bg-white shadow px-6 py-4 flex items-center justify-between border-b border-gray-200">
       <h1 className="text-2xl font-bold text-black">Admin Dashboard</h1>
       <div className="flex gap-4">
         <button

@@ -92,6 +92,8 @@ const Register = () => {
     }
 
     try {
+      console.log('Submitting form:', form);
+
       const response = await fetch('http://localhost:8081/auth/register', {
         method: 'POST',
         headers: {
@@ -100,29 +102,34 @@ const Register = () => {
         body: JSON.stringify(form),
       });
 
+      const resData = await response.json();
+      console.log('Server Response:', resData);
+
       if (!response.ok) {
-        const resData = await response.json();
         setError(resData.message || 'Error registering employee.');
       } else {
         setSuccess('Registered successfully!');
         setTimeout(() => {
-          router.push('/admin/dashboard'); // navigate to dashboard
+          router.push('/admin/dashboard');
         }, 1500);
       }
-    } catch  {
+    } catch (error: unknown) {
+      console.error('Registration Error:', error);
       setError('Something went wrong. Please try again.');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-semibold text-center mb-4">Register New Employee</h2>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-3xl">
+        <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
+          Register New Employee
+        </h2>
 
-        {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
-        {success && <div className="text-green-600 text-sm mb-2">{success}</div>}
+        {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
+        {success && <div className="bg-green-100 text-green-700 p-3 rounded mb-4">{success}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             { label: 'Full Name', name: 'name', type: 'text' },
             { label: 'Email', name: 'email', type: 'email' },
@@ -150,12 +157,12 @@ const Register = () => {
                 }
                 onChange={handleChange}
                 required
-                className="mt-1 p-2 w-full border border-gray-300 rounded"
+                className="mt-1 block w-full p-2 border border-gray-300 rounded"
               />
             </div>
           ))}
 
-          <div>
+          <div className="col-span-1 md:col-span-2">
             <label htmlFor="status" className="block text-sm font-medium text-gray-700">
               Status
             </label>
@@ -165,7 +172,7 @@ const Register = () => {
               value={form.status}
               onChange={handleChange}
               required
-              className="mt-1 p-2 w-full border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded"
             >
               <option value="">Select status</option>
               <option value="Active">Active</option>
@@ -173,12 +180,14 @@ const Register = () => {
             </select>
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
-          >
-            Register
-          </button>
+          <div className="col-span-1 md:col-span-2">
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
+            >
+              Register Employee
+            </button>
+          </div>
         </form>
       </div>
     </div>

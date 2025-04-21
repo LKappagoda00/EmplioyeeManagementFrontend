@@ -13,6 +13,8 @@ type Employee = {
   jobTitle: string;
   salary: number;
   status: string;
+  role: string;
+  address: string;
 };
 
 const UpdateEmployeePage = () => {
@@ -135,6 +137,22 @@ const UpdateEmployeePage = () => {
           name="jobTitle"
           placeholder="Job Title"
           value={employee.jobTitle}
+          onChange={handleChange}
+          className="p-2 border rounded"
+        />
+        <input
+          type="text"
+          name="address"
+          placeholder="Address"
+          value={employee.address}
+          onChange={handleChange}
+          className="p-2 border rounded"
+        />
+        <input
+          type="text"
+          name="role"
+          placeholder="Role"
+          value={employee.role}
           onChange={handleChange}
           className="p-2 border rounded"
         />

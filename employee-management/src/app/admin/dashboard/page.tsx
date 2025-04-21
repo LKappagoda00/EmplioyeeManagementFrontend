@@ -2,14 +2,20 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AdminHeader from '@/components/adminHeader'
+import AdminHeader from '@/components/adminHeader';
 
-// Define the type for admin profile
 type AdminProfile = {
   id: number;
   name: string;
   email: string;
   role: string;
+  JobTitle: string;
+  Department: string;
+  address: string;
+  phone: string;
+  designation: string;
+  status: string;
+  salary: number;
 };
 
 const AdminDashboard = () => {
@@ -47,6 +53,13 @@ const AdminDashboard = () => {
           name: json.employees.name,
           email: json.employees.email,
           role: json.employees.role,
+          JobTitle: json.employees.jobTitle,
+          Department: json.employees.department,
+          address: json.employees.address,
+          phone: json.employees.phone,
+          designation: json.employees.designation,
+          status: json.employees.status,
+          salary: json.employees.salary,
         };
         setProfile(data);
       } catch (err) {
@@ -75,13 +88,59 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow text-black">
-        <AdminHeader/>
-        <p><strong>Name:</strong> {profile.name}</p>
-        <p><strong>Email:</strong> {profile.email}</p>
-        <p><strong>Role:</strong> {profile.role}</p>
+    <div className="min-h-screen bg-gray-100 pt-24 px-8">
+      <AdminHeader />
+      <div className="min-h-screen bg-gray-100 py-16 px-4 sm:px-8">
+  <div className="max-w-6xl mx-auto bg-white p-10 rounded-2xl shadow-xl">
+    <h2 className="text-3xl font-bold text-gray-800 mb-8 border-b pb-4">Admin Profile</h2>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8 text-gray-700">
+      <div>
+        <p className="text-sm text-gray-500">Name</p>
+        <p className="text-lg font-medium">{profile.name}</p>
       </div>
+      <div>
+        <p className="text-sm text-gray-500">Email</p>
+        <p className="text-lg font-medium">{profile.email}</p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">Role</p>
+        <p className="text-lg font-medium">{profile.role}</p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">Job Title</p>
+        <p className="text-lg font-medium">{profile.JobTitle}</p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">Department</p>
+        <p className="text-lg font-medium">{profile.Department}</p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">Address</p>
+        <p className="text-lg font-medium">{profile.address}</p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">Phone</p>
+        <p className="text-lg font-medium">{profile.phone}</p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">Designation</p>
+        <p className="text-lg font-medium">{profile.designation}</p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">Status</p>
+        <p className={`text-lg font-bold ${profile.status === 'Active' ? 'text-green-600' : 'text-red-500'}`}>
+          {profile.status}
+        </p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">Salary</p>
+        <p className="text-lg font-medium">${profile.salary.toLocaleString()}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
     </div>
   );
 };
