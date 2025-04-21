@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AdminHeader from '@/components/adminHeader';
 
 type FormFields = {
   name: string;
@@ -121,7 +122,10 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-3xl">
+      <div>
+        <AdminHeader/>
+      </div>
+      <div className="bg-white p-8 mt-15 rounded-lg shadow-lg w-full max-w-3xl">
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
           Register New Employee
         </h2>

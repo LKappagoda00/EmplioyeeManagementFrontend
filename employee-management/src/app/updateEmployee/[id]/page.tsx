@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import AdminHeader from '@/components/adminHeader';
 
 type Employee = {
   id: number;
@@ -34,16 +35,12 @@ const UpdateEmployeePage = () => {
           },
         });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch employee');
-        }
+        if (!response.ok) throw new Error('Failed to fetch employee');
 
         const data = await response.json();
-        if (data.employees) {
-          setEmployee(data.employees); // Directly using the employee object from the response
-        }
+        if (data.employees) setEmployee(data.employees);
         setLoading(false);
-      } catch (err: unknown) {
+      } catch (err) {
         console.error(err);
         setError('Error loading employee data');
         setLoading(false);
@@ -72,115 +69,88 @@ const UpdateEmployeePage = () => {
         body: JSON.stringify(employee),
       });
 
-      if (!response.ok) {
-        throw new Error('Update failed');
-      }
+      if (!response.ok) throw new Error('Update failed');
 
       alert('Employee updated successfully');
       router.push('/view-employees');
-    } catch (err: unknown) {
+    } catch (err) {
       console.error(err);
       setError('Failed to update employee');
     }
   };
 
-  if (loading) return <div className="text-center text-black mt-4">Loading...</div>;
-  if (error) return <div className="text-red-600 text-center mt-4">{error}</div>;
+  if (loading) return <div className="text-center text-gray-700 mt-10">Loading...</div>;
+  if (error) return <div className="text-red-600 text-center mt-10">{error}</div>;
   if (!employee) return null;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow mt-6 rounded text-black">
-      <h2 className="text-2xl font-bold mb-4">Update Employee</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={employee.name}
-          onChange={handleChange}
-          className="p-2 border rounded"
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={employee.email}
-          onChange={handleChange}
-          className="p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="phone"
-          placeholder="Phone"
-          value={employee.phone}
-          onChange={handleChange}
-          className="p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="department"
-          placeholder="Department"
-          value={employee.department}
-          onChange={handleChange}
-          className="p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="designation"
-          placeholder="Designation"
-          value={employee.designation}
-          onChange={handleChange}
-          className="p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="jobTitle"
-          placeholder="Job Title"
-          value={employee.jobTitle}
-          onChange={handleChange}
-          className="p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="address"
-          placeholder="Address"
-          value={employee.address}
-          onChange={handleChange}
-          className="p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="role"
-          placeholder="Role"
-          value={employee.role}
-          onChange={handleChange}
-          className="p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="salary"
-          placeholder="Salary"
-          value={employee.salary}
-          onChange={handleChange}
-          className="p-2 border rounded"
-        />
-        <select
-          name="status"
-          value={employee.status}
-          onChange={handleChange}
-          className="p-2 border rounded"
-        >
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      {/* Header */}
+      <div className="shadow-md">
+        <AdminHeader />
+      </div>
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          Update Employee
-        </button>
-      </form>
+      {/* Main content */}
+      <main className="max-w-6xl mx-auto mt-15 px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-white p-8 rounded-lg shadow-xl">
+          <h2 className="text-3xl font-bold text-center mb-10">Update Employee Details</h2>
+
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { label: 'Name', name: 'name', type: 'text' },
+              { label: 'Email', name: 'email', type: 'email' },
+              { label: 'Phone', name: 'phone', type: 'text' },
+              { label: 'Department', name: 'department', type: 'text' },
+              { label: 'Designation', name: 'designation', type: 'text' },
+              { label: 'Job Title', name: 'jobTitle', type: 'text' },
+              { label: 'Address', name: 'address', type: 'text' },
+              { label: 'Role', name: 'role', type: 'text' },
+              { label: 'Salary', name: 'salary', type: 'number' },
+            ].map((field) => (
+              <div key={field.name}>
+                <label htmlFor={field.name} className="block font-medium mb-1">
+                  {field.label}
+                </label>
+                <input
+                  type={field.type}
+                  name={field.name}
+                  id={field.name}
+                  value={employee[field.name as keyof Employee]}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            ))}
+
+            {/* Status Dropdown */}
+            <div>
+              <label htmlFor="status" className="block font-medium mb-1">
+                Status
+              </label>
+              <select
+                name="status"
+                id="status"
+                value={employee.status}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+
+            {/* Submit Button */}
+            <div className="md:col-span-2 mt-4">
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition duration-200"
+              >
+                Update Employee
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
     </div>
   );
 };

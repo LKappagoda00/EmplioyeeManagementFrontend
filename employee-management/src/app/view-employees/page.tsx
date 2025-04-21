@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AdminHeader from '@/components/adminHeader';
 
 type Employee = {
   id: number;
@@ -81,7 +82,10 @@ const ViewEmployees = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-md">
+      <div>
+        <AdminHeader/>
+      </div>
+      <div className="max-w-6xl mx-auto mt-15 bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-3xl font-bold mb-6 text-black text-center">All Employees</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-300 rounded-lg">
