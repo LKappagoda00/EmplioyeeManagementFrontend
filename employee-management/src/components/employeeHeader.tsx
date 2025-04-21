@@ -18,12 +18,6 @@ const EmployeeHeader = () => {
     <div className="fixed top-0 left-0 right-0 z-50 w-full bg-white shadow px-6 py-4 flex items-center justify-between border-b border-gray-200">
       <h1 className="text-2xl font-bold text-black">Employee Dashboard</h1>
       <div className="flex gap-4">
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          onClick={() => router.push('/register')}
-        >
-          View Profile
-        </button>
 
         <button
           onClick={handleLogout}
