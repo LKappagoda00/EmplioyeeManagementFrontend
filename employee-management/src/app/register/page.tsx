@@ -1,137 +1,139 @@
 'use client';
-import React, { useState } from 'react';
+
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminHeader from '@/components/adminHeader';
-
-type FormFields = {
-  name: string;
-  email: string;
-  password: string;
-  address: string;
-  department: string;
-  role: string;
-  phone: string;
-  designation: string;
-  jobTitle: string;
-  salary: number;
-  status: string;
-};
 
 const Register = () => {
   const router = useRouter();
 
-  const [form, setForm] = useState<FormFields>({
-    name: '',
+  const [form, setForm] = useState({
     email: '',
     password: '',
+    name: '',
     address: '',
     department: '',
     role: '',
     phone: '',
     designation: '',
     jobTitle: '',
-    salary: 0,
+    salary: '',
     status: '',
   });
 
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState('');
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setForm((prevForm) => ({
-      ...prevForm,
-      [name]: name === 'salary' ? Number(value) : value,
-    }));
+    setForm((prevForm) => ({ ...prevForm, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const validateForm = () => {
-    if (
-      !form.name ||
-      !form.email ||
-      !form.password ||
-      !form.address ||
-      !form.department ||
-      !form.role ||
-      !form.phone ||
-      !form.designation ||
-      !form.jobTitle ||
-      form.salary <= 0 ||
-      !form.status
-    ) {
-      return 'All fields are required and salary must be greater than 0.';
-    }
+    const newErrors: Record<string, string> = {};
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email)) {
-      return 'Please enter a valid email address.';
-    }
+    if (!form.email) newErrors.email = 'Email is required.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+      newErrors.email = 'Invalid email format.';
 
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(form.phone)) {
-      return 'Please enter a valid 10-digit phone number.';
-    }
+    if (!form.password) newErrors.password = 'Password is required.';
+    else if (form.password.length < 6)
+      newErrors.password = 'Password must be at least 6 characters.';
 
-    if (form.password.length < 6) {
-      return 'Password should be at least 6 characters.';
-    }
+    if (!form.name) newErrors.name = 'Name is required.';
+    if (!form.address) newErrors.address = 'Address is required.';
+    if (!form.department) newErrors.department = 'Department is required.';
+    if (!form.role) newErrors.role = 'Role is required.';
 
-    return '';
+    if (!form.phone) newErrors.phone = 'Phone is required.';
+    else if (!/^\d{10}$/.test(form.phone))
+      newErrors.phone = 'Phone must be 10 digits.';
+
+    if (!form.designation) newErrors.designation = 'Designation is required.';
+    if (!form.jobTitle) newErrors.jobTitle = 'Job title is required.';
+
+    if (!form.salary) newErrors.salary = 'Salary is required.';
+    else if (isNaN(Number(form.salary)) || Number(form.salary) <= 0)
+      newErrors.salary = 'Salary must be a positive number.';
+
+    if (!form.status) newErrors.status = 'Status is required.';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const checkEmailExists = async (email: string) => {
+    try {
+      const res = await fetch(
+        `http://localhost:8081/auth/check-email?email=${email}`
+      );
+      const data = await res.json();
+      return data.exists;
+    } catch (error) {
+      console.error('Error checking email:', error);
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setSuccess('');
+    setErrors({});
 
-    const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
+    const isValid = validateForm();
+    if (!isValid) return;
+
+    const emailExists = await checkEmailExists(form.email);
+    if (emailExists) {
+      setErrors((prev) => ({
+        ...prev,
+        email: 'This email is already registered.',
+      }));
       return;
     }
 
     try {
-      console.log('Submitting form:', form);
-
       const response = await fetch('http://localhost:8081/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
 
       const resData = await response.json();
-      console.log('Server Response:', resData);
 
       if (!response.ok) {
-        setError(resData.message || 'Error registering employee.');
+        setErrors({ form: resData.message || 'Error registering employee.' });
       } else {
         setSuccess('Registered successfully!');
-        setTimeout(() => {
-          router.push('/admin/dashboard');
-        }, 1500);
+        setTimeout(() => router.push('/admin/dashboard'), 1500);
       }
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Registration Error:', error);
-      setError('Something went wrong. Please try again.');
+      setErrors({ form: 'Something went wrong. Please try again.' });
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div>
-        <AdminHeader/>
-      </div>
-      <div className="bg-white p-8 mt-15 rounded-lg shadow-lg w-full max-w-3xl">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-start pt-10 px-4">
+      <AdminHeader />
+      <div className="bg-white p-8 mt-6 rounded-lg shadow-lg w-full max-w-3xl">
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
           Register New Employee
         </h2>
 
-        {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
-        {success && <div className="bg-green-100 text-green-700 p-3 rounded mb-4">{success}</div>}
+        {errors.form && (
+          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+            {errors.form}
+          </div>
+        )}
+        {success && (
+          <div className="bg-green-100 text-green-700 p-3 rounded mb-4">
+            {success}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
@@ -154,15 +156,13 @@ const Register = () => {
                 id={name}
                 name={name}
                 type={type}
-                value={
-                  name === 'salary'
-                    ? form.salary.toString()
-                    : (form[name as keyof FormFields] as string)
-                }
+                value={form[name as keyof typeof form]}
                 onChange={handleChange}
-                required
                 className="mt-1 block w-full p-2 border border-gray-300 rounded"
               />
+              {errors[name] && (
+                <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
+              )}
             </div>
           ))}
 
@@ -175,13 +175,15 @@ const Register = () => {
               name="status"
               value={form.status}
               onChange={handleChange}
-              required
               className="mt-1 block w-full p-2 border border-gray-300 rounded"
             >
               <option value="">Select status</option>
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
             </select>
+            {errors.status && (
+              <p className="text-red-500 text-sm mt-1">{errors.status}</p>
+            )}
           </div>
 
           <div className="col-span-1 md:col-span-2">
